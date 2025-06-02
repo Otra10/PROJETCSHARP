@@ -16,37 +16,37 @@ class AuthController extends Controller
     /**
      * Redirige l'utilisateur vers Google pour l'authentification.
      */
-    public function redirectToGoogle(): RedirectResponse
-    {
-        return Socialite::driver('google')->stateless()->redirect();
-    }
+//     public function redirectToGoogle(): RedirectResponse
+//     {
+//         return Socialite::driver('google')->stateless()->redirect();
+//     }
 
-    public function handleGoogleCallback()
-{
-    $user = Socialite::driver('google')->stateless()->user();
+//     public function handleGoogleCallback()
+// {
+//     $user = Socialite::driver('google')->stateless()->user();
 
-    $existingUser = User::where('google_id', $user->id)->first();
-    if ($existingUser) {
-        auth()->login($existingUser, true);
-        $token = $existingUser->createToken('auth_token')->plainTextToken;
-    } else {
-        $newUser = new User();
-        $newUser->name = $user->name;
-        $newUser->email = $user->email;
-        $newUser->google_id = $user->id;
-        $newUser->password = bcrypt(Str::random()); // Génère un mot de passe aléatoire
-        $newUser->save();
-        auth()->login($newUser, true);
-        $token = $newUser->createToken('auth_token')->plainTextToken;
-    }
+//     $existingUser = User::where('google_id', $user->id)->first();
+//     if ($existingUser) {
+//         auth()->login($existingUser, true);
+//         $token = $existingUser->createToken('auth_token')->plainTextToken;
+//     } else {
+//         $newUser = new User();
+//         $newUser->name = $user->name;
+//         $newUser->email = $user->email;
+//         $newUser->google_id = $user->id;
+//         $newUser->password = bcrypt(Str::random()); // Génère un mot de passe aléatoire
+//         $newUser->save();
+//         auth()->login($newUser, true);
+//         $token = $newUser->createToken('auth_token')->plainTextToken;
+//     }
     
     
-    // Générez un token pour l'utilisateur
-    // $token = auth()->user()->createToken('auth_token')->plainTextToken;
+//     // Générez un token pour l'utilisateur
+//     // $token = auth()->user()->createToken('auth_token')->plainTextToken;
 
-    // Redirigez vers le front-end avec le token
-    return redirect()->to(env('BACKOFFICE_URL') . '/?token=' . $token);
-}
+//     // Redirigez vers le front-end avec le token
+//     return redirect()->to(env('BACKOFFICE_URL') . '/?token=' . $token);
+// }
 
 
     public function login(Request $request)

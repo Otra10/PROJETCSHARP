@@ -27,22 +27,44 @@ class EtudiantController extends Controller
         }
     }
 
-    public function index()
+     public function index()
     {
         $userId = Auth::id();
-
-        // Trouver l'étudiant correspondant à cet ID utilisateur avec ses relations
         $etudiant = Etudiant::with(['grade', 'classe.batiment'])
             ->where('user_id', $userId)
-            ->first();
+            ->firstOrFail();
+        
+        // Convertit le chemin de l'image en URL publique
+        $etudiant->image = asset($etudiant->image);
 
-        if ($etudiant) {
-            // Affecter l'URL complète à l'attribut image
-            $etudiant->image = asset($etudiant->image);
-            return response()->json($etudiant);
-        } else {
-            return response()->json(['message' => 'Étudiant non trouvé.'], 404);
-        }
+        return response()->json($etudiant);
+    }
+
+    /**
+     * Renvoie les infos de l'étudiant ET son statut de paiement.
+     * 
+     * Structure retournée :
+     * {
+     *   "student": { ... données de l'étudiant ... },
+     *   "status": { ... a_jour, montant_requis, montant_paye, etc. ... }
+     * }
+     */
+    public function statut()
+    {
+        $userId = Auth::id();
+        $etudiant = Etudiant::with(['grade', 'classe.batiment'])
+            ->where('user_id', $userId)
+            ->firstOrFail();
+        $etudiant->image = asset($etudiant->image);
+
+        // On récupère le statut de paiement via le PaiementController
+        $paiementCtrl = app(PaiementController::class);
+        $status = $paiementCtrl->getStatutPaiement($etudiant->id);
+
+        return response()->json([
+            'student' => $etudiant,
+            'status'  => $status,
+        ]);
     }
 
     public function store(Request $request)
