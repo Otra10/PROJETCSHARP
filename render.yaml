@@ -1,0 +1,49 @@
+# render.yaml
+
+services:
+  - type: web
+    name: carte-inov
+    env: php
+    plan: free
+    buildCommand: |
+      composer install --no-dev --optimize-autoloader
+      php artisan key:generate
+      php artisan migrate --force
+      php artisan storage:link
+    startCommand: php artisan serve --host 0.0.0.0 --port $PORT
+
+    # On récupère automatiquement les infos de la base créée (PostgreSQL)
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: false
+      - key: APP_KEY
+        generateValue: true
+
+      - key: APP_URL
+        value: https://carte-inov.onrender.com   # Mettre l’URL personnalisée une fois connue
+
+      - key: DB_CONNECTION
+        value: pgsql
+      - key: DB_HOST
+        fromDatabase:
+          name: carte_inov   # Remplace par le nom exact de ta base Render
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: carte_inov
+          property: port
+      - key: DB_DATABASE
+        fromDatabase:
+          name: carte_inov
+          property: database
+      - key: DB_USERNAME
+        fromDatabase:
+        name: carte_inov
+        property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+        name: carte_inov
+        property: password
+
